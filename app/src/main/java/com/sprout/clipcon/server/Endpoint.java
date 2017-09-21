@@ -31,7 +31,7 @@ import javax.websocket.Session;
 public class Endpoint {
 
 //     private String uri = "ws://delf.gonetis.com:8080/websocketServerModule/ServerEndpoint";
-    private String uri = "ws://223.194.152.247:8080/websocketServerModule/ServerEndpoint";
+    private String uri = "ws://113.198.84.53:80/globalclipboard";
 
     private Session session;
     private static User user;

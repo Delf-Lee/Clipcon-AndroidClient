@@ -36,7 +36,7 @@ public class ContentsDownload {
 
 
 //    private final static String SERVER_URL = "http://223.194.159.121:8080/websocketServerModule";
-    private final static String SERVER_URL = "http://223.194.152.247:8080/websocketServerModule";
+    private final static String SERVER_URL = "http://113.198.84.53:80/globalclipboard";
 //    private final static String SERVER_URL = "http://delf.gonetis.com:8080/websocketServerModule";
     private final static String SERVER_SERVLET = "/DownloadServlet";
 

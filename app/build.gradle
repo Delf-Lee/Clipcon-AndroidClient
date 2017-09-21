@@ -33,4 +33,8 @@ dependencies {
     compile group: 'org.json', name: 'json', version: '20160810'
     compile files('libs/javax.websocket-api-1.1.jar')
     compile files('libs/tyrus-standalone-client-1.13.jar')
+
+    compile 'com.google.firebase:firebase-messaging:9.0.2'
 }
+
+apply plugin: 'com.google.gms.google-services'
