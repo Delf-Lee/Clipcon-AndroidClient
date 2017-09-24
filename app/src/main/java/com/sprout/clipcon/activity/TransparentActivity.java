@@ -2,7 +2,6 @@ package com.sprout.clipcon.activity;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
@@ -24,12 +23,12 @@ import android.widget.Toast;
 
 import com.sprout.clipcon.R;
 import com.sprout.clipcon.model.Message;
-import com.sprout.clipcon.server.ContentsDownload;
-import com.sprout.clipcon.server.ContentsUpload;
 import com.sprout.clipcon.server.Endpoint;
 import com.sprout.clipcon.server.EndpointInBackGround;
+import com.sprout.clipcon.transfer.RetrofitUploadData;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 /**
  * Created by Yongwon on 2017. 5. 1..
@@ -68,7 +67,6 @@ public class TransparentActivity extends Activity {
         String type = getIntent().getType();
 
         if (Intent.ACTION_SEND.equals(action)) {
-
             getPermission();
             uri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
 
@@ -78,6 +76,8 @@ public class TransparentActivity extends Activity {
             String mimeType = mime.getExtensionFromMimeType(cR.getType(uri)); // get "file name extension"
             Log.d("delf", "[DEBUG] shared date mime type is " + mimeType);
 
+            showUploadProgressNoti();
+
             if (type.startsWith("image/")) {
                 Toast.makeText(getApplicationContext(), R.string.shareImage, Toast.LENGTH_SHORT).show();
 
@@ -85,19 +85,16 @@ public class TransparentActivity extends Activity {
                 new EndpointInBackGround()
                         .setSendBitmapImage(bitmap)
                         .execute(Message.UPLOAD, "image");
-
-                uploadProgressNoti();
-
             } else {
                 Toast.makeText(getApplicationContext(), R.string.shareFile, Toast.LENGTH_SHORT).show();
                 Log.d("delf", "[DEBUG] uri.getPath() = " + uri.getPath());
 
                 String filePath = getPathFromUri(uri);
+                Log.d("hee", "[DEBUG] filePath = " + filePath);
+
                 new EndpointInBackGround()
                         .setFilePath(filePath)
                         .execute(Message.UPLOAD, "file");
-
-                uploadProgressNoti();
             }
 
         }
@@ -111,6 +108,7 @@ public class TransparentActivity extends Activity {
             Cursor cursor = getContentResolver().query(uri, null, null, null, null );
             cursor.moveToNext();
             path = cursor.getString( cursor.getColumnIndex( "_data" ) );
+            Log.d("hee", "[DEBUG] path: " + path);
             cursor.close();
         } catch (NullPointerException e) {
             path = uri.getPath();
@@ -150,46 +148,54 @@ public class TransparentActivity extends Activity {
         }
     }
 
-    private void uploadProgressNoti() {
-        final int id = 3;
+    public void showUploadProgressNoti() {
+        final int id = 1;
         final NotificationManager mNotifyManager =
                 (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext());
+
         mBuilder.setContentTitle("Data Upload")
                 .setContentText("Upload in progress")
-                .setSmallIcon(R.drawable.icon_logo);
+                .setSmallIcon(R.drawable.icon_logo)
+                .setProgress(0, 0, true);
 
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        mBuilder.setProgress(0, 0, true);
-                        mNotifyManager.notify(id, mBuilder.build());
+        mNotifyManager.notify(id, mBuilder.build());
 
-                        ContentsUpload.UploadCallback uploadCallback = new ContentsUpload.UploadCallback() {
-                            @Override
-                            public void onSuccess() {
-                                Intent intent = new Intent(getApplicationContext(), GroupActivity.class);
-                                intent.putExtra("History", "test");
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        RetrofitUploadData.UploadCallback uploadCallback = new RetrofitUploadData.UploadCallback() {
+            @Override
+            public void onUpload(long onGoing, long fileLength, double progressValue) {
+                double onGoingMB = ((onGoing / 1024.0) / 1024.0);
+                double fileLengthMB = ((fileLength / 1024.0) / 1024.0);
 
-                                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                DecimalFormat dec = new DecimalFormat("0.0");
 
-                                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-                                mBuilder.setProgress(0,0,false);
-                                mBuilder.setContentText("Upload complete");
-                                mBuilder.setAutoCancel(true);
-//                                mBuilder.setPriority(Notification.PRIORITY_MAX);
-//                                mBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.FLAG_ONLY_ALERT_ONCE);
-                                mBuilder.setContentIntent(pendingIntent);
+                String progress = (int) progressValue + "% (" + dec.format(onGoingMB) + " / " + dec.format(fileLengthMB) + " MB)";
 
-                                mNotifyManager.notify(id, mBuilder.build());
-                            }
-                        };
-                        Endpoint.getUploader().setUploadCallback(uploadCallback);
-                    }
-                }
-        ).start();
+                mBuilder.setProgress(100, (int)progressValue, false);
+                mBuilder.setContentText("Uploading...  " + progress);
+                mBuilder.setAutoCancel(true);
+
+                mNotifyManager.notify(id, mBuilder.build());
+            }
+            @Override
+            public void onComplete() {
+                Intent intent = new Intent(getApplicationContext(), GroupActivity.class);
+                intent.putExtra("History", "test");
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+
+                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                mBuilder.setProgress(100, 100, false);
+                mBuilder.setContentText("Upload complete");
+                mBuilder.setAutoCancel(true);
+                mBuilder.setContentIntent(pendingIntent);
+
+                mNotifyManager.notify(id, mBuilder.build());
+            }
+        };
+
+        Endpoint.getUploader().setUploadCallback(uploadCallback);
     }
 }
 
