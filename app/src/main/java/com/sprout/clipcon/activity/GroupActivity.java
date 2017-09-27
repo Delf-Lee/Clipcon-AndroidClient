@@ -5,8 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,7 +26,7 @@ import com.sprout.clipcon.R;
 import com.sprout.clipcon.fragment.HistoryFragment;
 import com.sprout.clipcon.fragment.InfoFragment;
 import com.sprout.clipcon.model.Message;
-import com.sprout.clipcon.server.EndpointInBackGround;
+import com.sprout.clipcon.server.BackgroundTaskHandler;
 import com.sprout.clipcon.service.ClipboardService;
 import com.sprout.clipcon.service.NotificationService;
 
@@ -58,8 +56,8 @@ public class GroupActivity extends AppCompatActivity {
         super.onResume();
 
         Intent intent = getIntent();
-        if(intent != null) {
-            if(checkType != null) {
+        if (intent != null) {
+            if (checkType != null) {
                 TabLayout.Tab tab = tabLayout.getTabAt(1);
                 tab.select();
             }
@@ -113,7 +111,7 @@ public class GroupActivity extends AppCompatActivity {
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        new EndpointInBackGround().execute(Message.REQUEST_EXIT_GROUP);
+                        new BackgroundTaskHandler().execute(Message.REQUEST_EXIT_GROUP);
                         Intent intent = new Intent(getApplicationContext(), ClipboardService.class);
                         stopService(intent);
                         GroupActivity.super.onBackPressed();
@@ -206,10 +204,7 @@ public class GroupActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String type = intent.getStringExtra("History");  //get the type of message from MyGcmListenerService 1 - lock or 0 -Unlock
-//            SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
-//            Sensor accelerometer = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            if (type.equals("test")) // 1 == lock
-            {
+            if (type.equals("test")) {
                 checkType = type;
             }
         }

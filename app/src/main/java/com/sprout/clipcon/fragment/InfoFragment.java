@@ -24,7 +24,7 @@ import com.sprout.clipcon.adapter.MemberAdapter;
 import com.sprout.clipcon.model.Member;
 import com.sprout.clipcon.model.Message;
 import com.sprout.clipcon.server.Endpoint;
-import com.sprout.clipcon.server.EndpointInBackGround;
+import com.sprout.clipcon.server.BackgroundTaskHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -100,7 +100,7 @@ public class InfoFragment extends Fragment {
     }
 
     private void updateMember(String name) {
-        Log.d("delf", "[CLIENT] receive name is " + name);
+        Log.d("delf", "receive name is " + name);
 
         if (isContain(name)) {
             membersArrayList.remove(getIndex(name));
@@ -139,7 +139,7 @@ public class InfoFragment extends Fragment {
                 .input(R.string.empty, R.string.empty, false, new MaterialDialog.InputCallback() {
                     @Override
                     public void onInput(@NonNull MaterialDialog dialog, final CharSequence changedNickname) {
-                        new EndpointInBackGround().execute(Message.REQUEST_CHANGE_NAME, changedNickname.toString());
+                        new BackgroundTaskHandler().execute(Message.REQUEST_CHANGE_NAME, changedNickname.toString());
                     }
                 }).show();
     }

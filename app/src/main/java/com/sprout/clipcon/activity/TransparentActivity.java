@@ -17,14 +17,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.sprout.clipcon.R;
 import com.sprout.clipcon.model.Message;
 import com.sprout.clipcon.server.Endpoint;
-import com.sprout.clipcon.server.EndpointInBackGround;
+import com.sprout.clipcon.server.BackgroundTaskHandler;
 import com.sprout.clipcon.transfer.RetrofitUploadData;
 
 import java.io.IOException;
@@ -69,12 +68,9 @@ public class TransparentActivity extends Activity {
         if (Intent.ACTION_SEND.equals(action)) {
             getPermission();
             uri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
-
-            Log.d("delf", "[DEBUG] shared date type is " + type);
             ContentResolver cR = getContentResolver();
             MimeTypeMap mime = MimeTypeMap.getSingleton();
             String mimeType = mime.getExtensionFromMimeType(cR.getType(uri)); // get "file name extension"
-            Log.d("delf", "[DEBUG] shared date mime type is " + mimeType);
 
             showUploadProgressNoti();
 
@@ -82,17 +78,15 @@ public class TransparentActivity extends Activity {
                 Toast.makeText(getApplicationContext(), R.string.shareImage, Toast.LENGTH_SHORT).show();
 
                 bitmap = getBitmapByUri(uri);
-                new EndpointInBackGround()
+                new BackgroundTaskHandler()
                         .setSendBitmapImage(bitmap)
                         .execute(Message.UPLOAD, "image");
             } else {
                 Toast.makeText(getApplicationContext(), R.string.shareFile, Toast.LENGTH_SHORT).show();
-                Log.d("delf", "[DEBUG] uri.getPath() = " + uri.getPath());
 
                 String filePath = getPathFromUri(uri);
-                Log.d("hee", "[DEBUG] filePath = " + filePath);
 
-                new EndpointInBackGround()
+                new BackgroundTaskHandler()
                         .setFilePath(filePath)
                         .execute(Message.UPLOAD, "file");
             }
@@ -108,7 +102,6 @@ public class TransparentActivity extends Activity {
             Cursor cursor = getContentResolver().query(uri, null, null, null, null );
             cursor.moveToNext();
             path = cursor.getString( cursor.getColumnIndex( "_data" ) );
-            Log.d("hee", "[DEBUG] path: " + path);
             cursor.close();
         } catch (NullPointerException e) {
             path = uri.getPath();
@@ -128,21 +121,10 @@ public class TransparentActivity extends Activity {
 
     private void getPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-                // Show an expanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
             } else {
-                // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
             }
         } else {
         }

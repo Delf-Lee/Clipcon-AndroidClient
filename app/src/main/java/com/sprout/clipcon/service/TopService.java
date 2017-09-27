@@ -25,7 +25,7 @@ import com.sprout.clipcon.R;
 import com.sprout.clipcon.activity.GroupActivity;
 import com.sprout.clipcon.model.Message;
 import com.sprout.clipcon.server.Endpoint;
-import com.sprout.clipcon.server.EndpointInBackGround;
+import com.sprout.clipcon.server.BackgroundTaskHandler;
 import com.sprout.clipcon.transfer.RetrofitUploadData;
 
 public class TopService extends Service {
@@ -44,7 +44,6 @@ public class TopService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("delf", "[SYSTEM] TopService was created.");
         isRunning = true;
         // create <top_view> layout on Top
         LayoutInflater mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -70,7 +69,6 @@ public class TopService extends Service {
         super.onDestroy();
         m_WindowManager.removeView(m_View);
         m_WindowManager = null;
-        Log.d("delf", "[SYSTEM] TopService is destroyed.");
         isRunning = false;
     }
 
@@ -83,12 +81,10 @@ public class TopService extends Service {
 
     // event occurs when Top button pressed after clipboard changing
     public void onClickImageBtn(View v) {
-        Log.d("delf", "[SYSTEM] floating button clicked.");
         ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         Toast.makeText(getApplicationContext(), R.string.shareString, Toast.LENGTH_SHORT).show();
 
         if (!cm.hasPrimaryClip()) {
-            Toast.makeText(this, "Clipboard is empty", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -99,7 +95,7 @@ public class TopService extends Service {
 
             showUploadProgressNoti();
 
-            new EndpointInBackGround()
+            new BackgroundTaskHandler()
                     .setSendText(textData)
                     .execute(Message.UPLOAD, "text");
 

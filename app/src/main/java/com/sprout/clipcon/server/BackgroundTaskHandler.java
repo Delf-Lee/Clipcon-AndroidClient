@@ -18,7 +18,7 @@ import javax.websocket.EncodeException;
  * Created by delf on 17-05-06.
  */
 
-public class EndpointInBackGround extends AsyncTask<String, Void, String> {
+public class BackgroundTaskHandler extends AsyncTask<String, Void, String> {
     private final static int TYPE = 0;
     private final static int GROUP_PK = 1;
     private BackgroundCallback backgroundCallback;
@@ -28,22 +28,22 @@ public class EndpointInBackGround extends AsyncTask<String, Void, String> {
     private String filePath;
     private File uploadFile; // test
 
-    public EndpointInBackGround setSendBitmapImage(Bitmap sendBitmapImage) {
+    public BackgroundTaskHandler setSendBitmapImage(Bitmap sendBitmapImage) {
         this.sendBitmapImage = sendBitmapImage;
         return this;
     }
 
-    public EndpointInBackGround setSendText(String sendText) {
+    public BackgroundTaskHandler setSendText(String sendText) {
         this.sendText = sendText;
         return this;
     }
 
-    public EndpointInBackGround setFilePath(String filePath) {
+    public BackgroundTaskHandler setFilePath(String filePath) {
         this.filePath = filePath;
         return this;
     }
 
-    public EndpointInBackGround setUploadFile(File uploadFile) {
+    public BackgroundTaskHandler setUploadFile(File uploadFile) {
         this.uploadFile = uploadFile;
         return this;
     }
@@ -52,10 +52,10 @@ public class EndpointInBackGround extends AsyncTask<String, Void, String> {
         void onSuccess(JSONObject result);
     }
 
-    public EndpointInBackGround() {
+    public BackgroundTaskHandler() {
     }
 
-    public EndpointInBackGround(BackgroundCallback callback) {
+    public BackgroundTaskHandler(BackgroundCallback callback) {
         this.backgroundCallback = callback;
     }
 
@@ -63,12 +63,12 @@ public class EndpointInBackGround extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... msg) {
         switch (msg[TYPE]) {
             case Message.CONNECT:
-                Log.d("delf", "[CLIENT] connecting server...");
+                Log.d("BackgroundTaskHandler", "Connecting server...");
                 Endpoint.getInstance();
                 break;
 
             case Message.REQUEST_CREATE_GROUP:
-                Log.d("delf", "[CLIENT] send group create request to server."); // XXX: caution!
+                Log.d("BackgroundTaskHandler", "send group create request to server."); // XXX: caution!
                 setCallBack();
                 sendMessage(
                         new Message().setType(Message.REQUEST_CREATE_GROUP)
@@ -77,7 +77,7 @@ public class EndpointInBackGround extends AsyncTask<String, Void, String> {
 
             case Message.REQUEST_JOIN_GROUP:
                 setCallBack();
-                Log.d("delf", "[CLIENT] send group join request to server. group pk is \"" + msg[GROUP_PK] + "\"");
+                Log.d("BackgroundTaskHandler", "send group join request to server. group pk is \"" + msg[GROUP_PK] + "\"");
                 sendMessage(
                         new Message().setType(Message.REQUEST_JOIN_GROUP)
                                 .add(Message.GROUP_PK, msg[GROUP_PK]) // msg[1]: group key
@@ -85,47 +85,38 @@ public class EndpointInBackGround extends AsyncTask<String, Void, String> {
                 break;
 
             case Message.UPLOAD:
-                Log.d("delf", "[CLIENT] send upload request to server");
+                Log.d("BackgroundTaskHandler", "send upload request to server");
                 switch (msg[1]) {
                     case "text":
-                        Log.d("delf", "[DEBUG] EndpointBackground: uplaod()/ text upload /" + sendText);
                         Endpoint.getUploader().uploadStringData(sendText);
                         break;
                     case "image":
-                        Log.d("delf", "[DEBUG] EndpointBackground: uplaod()/ image upload.");
                         Endpoint.getUploader().uploadImageData(sendBitmapImage);
                         break;
                     case "file":
-                        Log.d("delf", "[DEBUG] EndpointBackground: uplaod()/ file upload / " + filePath);
                         Endpoint.getUploader().uploadMultipartData(filePath);
                         break;
                 }
                 break;
 
             case Message.DOWNLOAD:
-                Log.d("delf", "[CLIENT] send download request to server. pk is " + Endpoint.lastContentsPK);
+                Log.d("BackgroundTaskHandler", "Send download request to server. pk is " + Endpoint.lastContentsPK);
                 try {
                     Endpoint.getDownloader().requestDataDownload(msg[1]); // for test
                 } catch (MalformedURLException e) {
-                    Log.e("delf", "[CLIENT] error at sending download request");
-                    e.printStackTrace();
+                    Log.e("delf", "Error at sending download request");
+                    // e.printStackTrace();
                 }
                 break;
 
             case Message.REQUEST_EXIT_GROUP:
-                Log.d("delf", "[CLIENT] send exit request to server");
+                Log.d("BackgroundTaskHandler", "Send exit request to server");
                 sendMessage(
                         new Message().setType(Message.REQUEST_EXIT_GROUP)
                 );
                 break;
-            case "test":
-                Log.d("delf", "send test request");
-                sendMessage(
-                        new Message().setType("test: hansung")
-                );
-                break;
+
             case Message.REQUEST_CHANGE_NAME:
-                Log.d("delf", "[DEBUG] nickname: " + msg[1]);
                 sendMessage(
                         new Message().setType(Message.REQUEST_CHANGE_NAME)
                                 .add(Message.CHANGE_NAME, msg[1])
@@ -133,7 +124,7 @@ public class EndpointInBackGround extends AsyncTask<String, Void, String> {
                 break;
 
             default:
-                Log.d("delf", "do nothing in doInBackground()");
+                Log.d("BackgroundTaskHandler", "Do nothing in doInBackground()");
                 break;
         }
         return null;
@@ -162,6 +153,6 @@ public class EndpointInBackGround extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String s) {
-        Log.d("delf", "[SYSTEM] end AsyncTask.");
+        Log.d("delf", "End AsyncTask.");
     }
 }

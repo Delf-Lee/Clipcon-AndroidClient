@@ -1,26 +1,22 @@
 package com.sprout.clipcon.activity;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v13.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.sprout.clipcon.R;
 import com.sprout.clipcon.model.Message;
-import com.sprout.clipcon.server.EndpointInBackGround;
+import com.sprout.clipcon.server.BackgroundTaskHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,14 +35,13 @@ public class MainActivity extends AppCompatActivity {
         Button createBtn = (Button) findViewById(R.id.main_create);
         Button joinBtn = (Button) findViewById(R.id.main_join);
 
-        new EndpointInBackGround().execute(Message.CONNECT); // connect
+        new BackgroundTaskHandler().execute(Message.CONNECT); // connect
 
         // create group
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("delf", "[SYSTEM] create group button clicked");
-                final EndpointInBackGround.BackgroundCallback result = new EndpointInBackGround.BackgroundCallback() {
+                final BackgroundTaskHandler.BackgroundCallback result = new BackgroundTaskHandler.BackgroundCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {
@@ -56,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 };
-                new EndpointInBackGround(result).execute(Message.REQUEST_CREATE_GROUP);
+                new BackgroundTaskHandler(result).execute(Message.REQUEST_CREATE_GROUP);
             }
         });
         // join group
@@ -71,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showJoinDialog() {
-        Log.d("delf", "join group button clicked");
         new MaterialDialog.Builder(this)
                 .title(R.string.inputKey)
                 .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PERSON_NAME)
@@ -79,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 .input(R.string.empty, R.string.empty, false, new MaterialDialog.InputCallback() {
                     @Override
                     public void onInput(@NonNull MaterialDialog dialog, final CharSequence inputGroupKey) {
-                        final EndpointInBackGround.BackgroundCallback result = new EndpointInBackGround.BackgroundCallback() {
+                        final BackgroundTaskHandler.BackgroundCallback result = new BackgroundTaskHandler.BackgroundCallback() {
                             @Override
                             public void onSuccess(JSONObject response) {
                                 try {
@@ -99,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                         };
-                        new EndpointInBackGround(result).execute(Message.REQUEST_JOIN_GROUP, inputGroupKey.toString());
+                        new BackgroundTaskHandler(result).execute(Message.REQUEST_JOIN_GROUP, inputGroupKey.toString());
                     }
                 }).show();
     }

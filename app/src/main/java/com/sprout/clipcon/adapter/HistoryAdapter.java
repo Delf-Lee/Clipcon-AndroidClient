@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,14 +25,12 @@ import com.sprout.clipcon.activity.GroupActivity;
 import com.sprout.clipcon.model.Contents;
 import com.sprout.clipcon.model.Message;
 import com.sprout.clipcon.server.Endpoint;
-import com.sprout.clipcon.server.EndpointInBackGround;
+import com.sprout.clipcon.server.BackgroundTaskHandler;
 import com.sprout.clipcon.transfer.RetrofitDownloadData;
 
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-
-import static android.R.attr.path;
 
 /**
  * Created by Yongwon on 2017. 4. 30..
@@ -97,8 +94,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                             @Override
                             public void onClick(View v) {
                                 Contents contents = contentsList.get(position);
-                                Log.d("delf", "[SYSTEM] type is " + contents.getContentsType());
-                                new EndpointInBackGround().execute(Message.DOWNLOAD, contents.getContentsPKName());
+                                Log.d("HistoryAdapter", "Data type is " + contents.getContentsType());
+                                new BackgroundTaskHandler().execute(Message.DOWNLOAD, contents.getContentsPKName());
                                 switch (contents.getContentsType()) {
                                     case Contents.TYPE_STRING:
                                         Toast.makeText(context, R.string.stringAlert, Toast.LENGTH_SHORT).show();
