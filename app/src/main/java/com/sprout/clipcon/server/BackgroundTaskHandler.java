@@ -69,6 +69,9 @@ public class BackgroundTaskHandler extends AsyncTask<String, Void, String> {
 
             case Message.REQUEST_CREATE_GROUP:
                 Log.d("BackgroundTaskHandler", "send group create request to server."); // XXX: caution!
+
+                Message message = new Message().setType(Message.REQUEST_CREATE_GROUP);
+
                 setCallBack();
                 sendMessage(
                         new Message().setType(Message.REQUEST_CREATE_GROUP)

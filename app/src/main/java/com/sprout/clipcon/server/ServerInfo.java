@@ -6,8 +6,9 @@ package com.sprout.clipcon.server;
 
 public class ServerInfo {
     private static final String PROTOCOL = "http://";
-    private static final String SERVER_ADDR = "113.198.84.53";
-    private static final String SERVER_PORT = "80";
+    //private static final String SERVER_ADDR = "113.198.84.53";
+    private static final String SERVER_ADDR = "118.176.16.163";
+    private static final String SERVER_PORT = "8080";
     private static final String CONTEXT_ROOT = "globalclipboard";
 
     public static final String SERVER_URL_PART = SERVER_ADDR + ":" + SERVER_PORT + "/" + CONTEXT_ROOT;

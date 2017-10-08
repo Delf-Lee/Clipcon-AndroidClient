@@ -23,7 +23,12 @@ import retrofit2.http.Streaming;
 public interface RetrofitInterface {
 
     // Path: [Protocol]://[URL]/[Resource Path]/
-    public static final String BASE_URL = ServerInfo.SERVER_URL + "/";
+    String BASE_URL = ServerInfo.SERVER_URL + "/";
+
+    @Multipart
+    @Headers({ "User-Agent: androidProgram" })
+    @POST("androridMessage")
+    Call<ResponseBody> commonRequest(@Part("message") RequestBody message);
 
     /** upload string data */
     @Multipart
@@ -43,21 +48,10 @@ public interface RetrofitInterface {
     @POST("UploadServlet")
     Call<ResponseBody> requestFileDataUpload(@Part("userName") RequestBody username, @Part("groupPK") RequestBody grouppk, @Part MultipartBody.Part file);
 
-//    /** upload multipart file data */
-//    @Multipart
-//    @Headers({ "User-Agent: androidProgram" })
-//    @POST("UploadServlet")
-//    Call<ResponseBody> requestFileDataUpload(@Part("userName") RequestBody username, @Part("groupPK") RequestBody grouppk, @Part("multipleFileListInfo") RequestBody multiplefileListInfo, @Part MultipartBody.Part file);
-//
     /** download */
     @Streaming
     @Headers({ "User-Agent: androidProgram" })
     @GET("DownloadServlet")
     Call<ResponseBody> requestFileDataDownload(@QueryMap Map<String, String> parameters);
-//
-//    /** send bug messgae */
-//    @Multipart
-//    @Headers({ "User-Agent: androidProgram" })
-//    @POST("BugReportServlet")
-//    Call<ResponseBody> sendBugMessage(@Part("bugMessage") RequestBody bugMessage);
+
 }
