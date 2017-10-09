@@ -88,6 +88,12 @@ public class MessageHandler {
         }
     }
 
+    public void handleMessage(Message message) {
+        switch (message.getType()) {
+
+        }
+    }
+
     public MessageHandler setSendBitmap(Bitmap sendBitmapImage) {
         this.uploadBitmapImage = sendBitmapImage;
         return this;
