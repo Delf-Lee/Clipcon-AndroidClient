@@ -1,7 +1,5 @@
 package com.sprout.clipcon.transfer;
 
-import com.sprout.clipcon.server.Endpoint;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,7 +13,8 @@ import okio.BufferedSink;
  */
 
 public class ProgressRequestBody extends RequestBody{
-    private Endpoint endpoint = Endpoint.getInstance();
+    // 임시주석
+    // private Endpoint endpoint = Endpoint.getInstance();
     private File mFile;
     private final int CHUNKSIZE = 0xFFFF; // 65536
 
@@ -44,7 +43,8 @@ public class ProgressRequestBody extends RequestBody{
                 int progressValue = (int) (100 * uploaded / fileLength);
 
                 // set progress value
-                endpoint.getUploader().getUploadCallback().onUpload(uploaded, fileLength, progressValue);
+                // 임시주석
+                // endpoint.getUploader().getUploadCallback().onUpload(uploaded, fileLength, progressValue);
 
                 uploaded += read;
                 sink.write(buffer, 0, read);

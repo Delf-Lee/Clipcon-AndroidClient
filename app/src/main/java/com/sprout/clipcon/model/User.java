@@ -1,7 +1,5 @@
 package com.sprout.clipcon.model;
 
-import android.util.Log;
-
 public class User {
 	private String name;
 	private Group group;
@@ -25,4 +23,6 @@ public class User {
 	public Group getGroup() {
 		return group;
 	}
+
+
 }

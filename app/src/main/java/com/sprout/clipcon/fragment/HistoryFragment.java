@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import com.sprout.clipcon.R;
 import com.sprout.clipcon.adapter.HistoryAdapter;
 import com.sprout.clipcon.model.Contents;
-import com.sprout.clipcon.server.Endpoint;
 
 import java.util.ArrayList;
 
@@ -49,7 +48,8 @@ public class HistoryFragment extends Fragment {
     }
 
     private void setContentsCallback() {
-        Endpoint.ContentsCallback contentsResult = new Endpoint.ContentsCallback() {
+        // 임시주석
+        /*Endpoint.ContentsCallback contentsResult = new Endpoint.ContentsCallback() {
             @Override
             public void onContentsUpdate(final Contents contents) {
                 getActivity().runOnUiThread(new Runnable() {
@@ -61,7 +61,7 @@ public class HistoryFragment extends Fragment {
                 });
             }
         };
-        Endpoint.getInstance().setContentsCallback(contentsResult);
+        Endpoint.getInstance().setContentsCallback(contentsResult);*/
     }
 
     private void updateHistory(Contents contents) {

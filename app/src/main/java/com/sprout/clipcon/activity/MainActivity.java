@@ -17,6 +17,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.sprout.clipcon.R;
 import com.sprout.clipcon.model.Message;
 import com.sprout.clipcon.server.BackgroundTaskHandler;
+import com.sprout.clipcon.server.MessageHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,23 +36,23 @@ public class MainActivity extends AppCompatActivity {
         Button createBtn = (Button) findViewById(R.id.main_create);
         Button joinBtn = (Button) findViewById(R.id.main_join);
 
-        new BackgroundTaskHandler().execute(Message.CONNECT); // connect
-
         // create group
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final BackgroundTaskHandler.BackgroundCallback result = new BackgroundTaskHandler.BackgroundCallback() {
                     @Override
-                    public void onSuccess(JSONObject response) {
+                    public void onSuccess(Message response) {
                         try {
-                            startGroupActivity(response);
+                            MessageHandler.getInstance().setUser(response);
+                            startGroupActivity(response.getJson());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
                 };
-                new BackgroundTaskHandler(result).execute(Message.REQUEST_CREATE_GROUP);
+                MessageHandler.getInstance().setBackgroundCallback(result).request(Message.REQUEST_CREATE_GROUP, null);
+                // new BackgroundTaskHandler(result).execute(Message.REQUEST_CREATE_GROUP);
             }
         });
         // join group
@@ -75,11 +76,12 @@ public class MainActivity extends AppCompatActivity {
                     public void onInput(@NonNull MaterialDialog dialog, final CharSequence inputGroupKey) {
                         final BackgroundTaskHandler.BackgroundCallback result = new BackgroundTaskHandler.BackgroundCallback() {
                             @Override
-                            public void onSuccess(JSONObject response) {
+                            public void onSuccess(Message response) {
                                 try {
                                     if (response.get(Message.RESULT).equals(Message.CONFIRM)) {
-                                        response.put(Message.GROUP_NAME, inputGroupKey.toString());
-                                        startGroupActivity(response);
+                                        MessageHandler.getInstance().setUser(response);
+                                        response.add(Message.GROUP_NAME, inputGroupKey.toString());
+                                        startGroupActivity(response.getJson());
                                     } else { // reject
                                         MainActivity.this.runOnUiThread(new Runnable() {
                                             @Override
@@ -93,7 +95,8 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                         };
-                        new BackgroundTaskHandler(result).execute(Message.REQUEST_JOIN_GROUP, inputGroupKey.toString());
+                        MessageHandler.getInstance().setBackgroundCallback(result).request(Message.REQUEST_JOIN_GROUP, inputGroupKey.toString());
+                        // new BackgroundTaskHandler(result).execute(Message.REQUEST_JOIN_GROUP, inputGroupKey.toString());
                     }
                 }).show();
     }

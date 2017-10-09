@@ -24,8 +24,7 @@ import android.widget.Toast;
 import com.sprout.clipcon.R;
 import com.sprout.clipcon.activity.GroupActivity;
 import com.sprout.clipcon.model.Message;
-import com.sprout.clipcon.server.Endpoint;
-import com.sprout.clipcon.server.BackgroundTaskHandler;
+import com.sprout.clipcon.server.MessageHandler;
 import com.sprout.clipcon.transfer.RetrofitUploadData;
 
 public class TopService extends Service {
@@ -35,7 +34,7 @@ public class TopService extends Service {
     private static String textData;
     private static Uri uri;
     public static boolean isRunning = false;
-
+    private RetrofitUploadData.UploadCallback uploadCallback;
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -95,9 +94,9 @@ public class TopService extends Service {
 
             showUploadProgressNoti();
 
-            new BackgroundTaskHandler()
-                    .setSendText(textData)
-                    .execute(Message.UPLOAD, "text");
+            MessageHandler requester = MessageHandler.getInstance();
+            requester.setSendText(textData);
+            requester.setUploadCallback(uploadCallback).request(Message.UPLOAD, "text");
 
         } else if (cm.getPrimaryClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_URILIST)) {
 
@@ -120,11 +119,12 @@ public class TopService extends Service {
 
         mNotifyManager.notify(id, mBuilder.build());
 
-        RetrofitUploadData.UploadCallback uploadCallback = new RetrofitUploadData.UploadCallback() {
+        uploadCallback = new RetrofitUploadData.UploadCallback() {
             @Override
             public void onUpload(long onGoing, long fileLength, double progressValue) { }
             @Override
             public void onComplete() {
+                Log.d("delf", "onnComplete 2009");
                 Intent intent = new Intent(getApplicationContext(), GroupActivity.class);
                 intent.putExtra("History", "test");
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -140,7 +140,11 @@ public class TopService extends Service {
                 mNotifyManager.notify(id, mBuilder.build());
             }
         };
+        Log.d("delf", "setUploadCallback");
+        MessageHandler.getUploader().setUploadCallback(uploadCallback);
+    }
 
-        Endpoint.getUploader().setUploadCallback(uploadCallback);
+    private void setCallback() {
+
     }
 }

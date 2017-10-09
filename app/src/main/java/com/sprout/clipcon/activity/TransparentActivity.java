@@ -22,8 +22,7 @@ import android.widget.Toast;
 
 import com.sprout.clipcon.R;
 import com.sprout.clipcon.model.Message;
-import com.sprout.clipcon.server.Endpoint;
-import com.sprout.clipcon.server.BackgroundTaskHandler;
+import com.sprout.clipcon.server.MessageHandler;
 import com.sprout.clipcon.transfer.RetrofitUploadData;
 
 import java.io.IOException;
@@ -38,22 +37,22 @@ public class TransparentActivity extends Activity {
     private final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
     private Uri uri;
     private static Bitmap bitmap;
+    private RetrofitUploadData.UploadCallback uploadCallback;
 
     //ask user about permission to save image into basic gallery apps.
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the contacts-related task you need to do.
+
                 } else {
-                    // permission denied, boo! Disable the functionality that depends on this permission.
+
                 }
-                return;
-            }
-            // other 'case' lines to check for other permissions this app might request
+                break;
+
         }
     }
 
@@ -78,17 +77,28 @@ public class TransparentActivity extends Activity {
                 Toast.makeText(getApplicationContext(), R.string.shareImage, Toast.LENGTH_SHORT).show();
 
                 bitmap = getBitmapByUri(uri);
-                new BackgroundTaskHandler()
+
+
+                MessageHandler requester = MessageHandler.getInstance();
+                requester.setSendBitmap(bitmap);
+                requester.setUploadCallback(uploadCallback).request(Message.UPLOAD, "image");
+
+/*                new BackgroundTaskHandler()
                         .setSendBitmapImage(bitmap)
-                        .execute(Message.UPLOAD, "image");
+                        .execute(Message.UPLOAD, "image");*/
+
             } else {
                 Toast.makeText(getApplicationContext(), R.string.shareFile, Toast.LENGTH_SHORT).show();
 
                 String filePath = getPathFromUri(uri);
 
-                new BackgroundTaskHandler()
+                MessageHandler requester = MessageHandler.getInstance();
+                requester.setFilePath(filePath);
+                requester.setUploadCallback(uploadCallback).request(Message.UPLOAD, "file");
+
+/*                new BackgroundTaskHandler()
                         .setFilePath(filePath)
-                        .execute(Message.UPLOAD, "file");
+                        .execute(Message.UPLOAD, "file");*/
             }
 
         }
@@ -143,7 +153,7 @@ public class TransparentActivity extends Activity {
 
         mNotifyManager.notify(id, mBuilder.build());
 
-        RetrofitUploadData.UploadCallback uploadCallback = new RetrofitUploadData.UploadCallback() {
+        uploadCallback = new RetrofitUploadData.UploadCallback() {
             @Override
             public void onUpload(long onGoing, long fileLength, double progressValue) {
                 double onGoingMB = ((onGoing / 1024.0) / 1024.0);
@@ -176,8 +186,8 @@ public class TransparentActivity extends Activity {
                 mNotifyManager.notify(id, mBuilder.build());
             }
         };
-
-        Endpoint.getUploader().setUploadCallback(uploadCallback);
+        MessageHandler.getUploader().setUploadCallback(uploadCallback);
+        // Endpoint.getUploader().setUploadCallback(uploadCallback);
     }
 }
 

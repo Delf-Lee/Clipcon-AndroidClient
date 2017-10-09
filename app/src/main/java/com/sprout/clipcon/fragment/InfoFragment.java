@@ -23,7 +23,6 @@ import com.sprout.clipcon.R;
 import com.sprout.clipcon.adapter.MemberAdapter;
 import com.sprout.clipcon.model.Member;
 import com.sprout.clipcon.model.Message;
-import com.sprout.clipcon.server.Endpoint;
 import com.sprout.clipcon.server.BackgroundTaskHandler;
 
 import org.json.JSONArray;
@@ -145,7 +144,8 @@ public class InfoFragment extends Fragment {
     }
 
     private void setMemberCallback() {
-        Endpoint.ParticipantCallback participantResult = new Endpoint.ParticipantCallback() {
+        // 임시주석
+        /*Endpoint.ParticipantCallback participantResult = new Endpoint.ParticipantCallback() {
             @Override
             public void onParticipantStatus(final String newMember) {
                 System.out.println("Member List Changed");
@@ -157,18 +157,19 @@ public class InfoFragment extends Fragment {
                 });
             }
         };
-        Endpoint.getInstance().setParticipantCallback(participantResult);
+        Endpoint.getInstance().setParticipantCallback(participantResult);*/
     }
 
     private void setNicknameCallback() {
-        Endpoint.NameChangeCallback nameChangeCallback = new Endpoint.NameChangeCallback() {
+        // 임시주석
+     /*   Endpoint.NameChangeCallback nameChangeCallback = new Endpoint.NameChangeCallback() {
             @Override
             public void onSuccess(String origin, String changed) {
                 Log.d("delf", "setNickName(): onSuccess.");
                 changeNickname(origin, changed);
             }
         };
-        Endpoint.getInstance().setNameChangeCallback(nameChangeCallback);
+        Endpoint.getInstance().setNameChangeCallback(nameChangeCallback);*/
     }
 
     public boolean isContain(String name) {

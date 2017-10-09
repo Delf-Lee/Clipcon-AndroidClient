@@ -1,3 +1,4 @@
+/*
 package com.sprout.clipcon.server;
 
 import android.os.Handler;
@@ -14,7 +15,6 @@ import com.sprout.clipcon.transfer.RetrofitDownloadData;
 import com.sprout.clipcon.transfer.RetrofitUploadData;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,7 +32,9 @@ import javax.websocket.Session;
 @ClientEndpoint(decoders = {MessageDecoder.class}, encoders = {MessageEncoder.class})
 public class Endpoint {
     private String uri = "ws://" + ServerInfo.SERVER_URL_PART + "/ServerEndpoint";
-    /* singleton instance */
+    */
+/* singleton instance *//*
+
     private static Endpoint uniqueEndpoint;
 
     private Session session;
@@ -42,7 +44,9 @@ public class Endpoint {
     private static RetrofitUploadData uniqueUploader;
     private static RetrofitDownloadData uniqueDownloader;
 
-    /* callback interface */
+    */
+/* callback interface *//*
+
     private SecondCallback secondCallback; // callback to MainActivity
     private ParticipantCallback participantCallback; // callback to MainActivity-InfoFragment
     private NameChangeCallback nameChangeCallback; // callback to MainActivity-InfoFragment
@@ -78,7 +82,7 @@ public class Endpoint {
     }
 
     public interface SecondCallback {
-        void onEndpointResponse(JSONObject result); // define at EndpointInBackground
+        void onEndpointResponse(Message result); // define at EndpointInBackground
     }
     public void setSecondCallback(SecondCallback callback) {
         secondCallback = callback;
@@ -128,7 +132,7 @@ public class Endpoint {
                 case Message.RESPONSE_CREATE_GROUP:
                     switch (message.get(Message.RESULT)) {
                         case Message.CONFIRM:
-                            secondCallback.onEndpointResponse(message.getJson());
+                            secondCallback.onEndpointResponse(message);
                             break;
 
                         case Message.REJECT:
@@ -138,7 +142,7 @@ public class Endpoint {
                     break;
 
                 case Message.RESPONSE_JOIN_GROUP:
-                    secondCallback.onEndpointResponse(message.getJson());
+                    secondCallback.onEndpointResponse(message);
                     switch (message.get(Message.RESULT)) {
                         case Message.CONFIRM:
                             break;
@@ -254,3 +258,4 @@ public class Endpoint {
 }
 
 
+*/

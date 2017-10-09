@@ -5,14 +5,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.sprout.clipcon.model.Message;
-
-import org.json.JSONObject;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-
-import javax.websocket.EncodeException;
+import com.sprout.clipcon.transfer.RetrofitCommonRequest;
+import com.sprout.clipcon.transfer.RetrofitUploadData;
 
 /**
  * Created by delf on 17-05-06.
@@ -21,87 +15,62 @@ import javax.websocket.EncodeException;
 public class BackgroundTaskHandler extends AsyncTask<String, Void, String> {
     private final static int TYPE = 0;
     private final static int GROUP_PK = 1;
-    private BackgroundCallback backgroundCallback;
 
     private Bitmap sendBitmapImage;
     private String sendText;
     private String filePath;
-    private File uploadFile; // test
 
-    public BackgroundTaskHandler setSendBitmapImage(Bitmap sendBitmapImage) {
-        this.sendBitmapImage = sendBitmapImage;
-        return this;
-    }
+    private RetrofitCommonRequest requester;
 
-    public BackgroundTaskHandler setSendText(String sendText) {
-        this.sendText = sendText;
-        return this;
-    }
-
-    public BackgroundTaskHandler setFilePath(String filePath) {
-        this.filePath = filePath;
-        return this;
-    }
-
-    public BackgroundTaskHandler setUploadFile(File uploadFile) {
-        this.uploadFile = uploadFile;
-        return this;
-    }
-
+    private BackgroundCallback backgroundCallback;
     public interface BackgroundCallback {
-        void onSuccess(JSONObject result);
+        void onSuccess(Message result);
+    }
+    public BackgroundTaskHandler setBackgroundCallback(BackgroundCallback backgroundCallback) {
+        this.backgroundCallback = backgroundCallback;
+        requester = new RetrofitCommonRequest(backgroundCallback);
+        return this;
     }
 
-    public BackgroundTaskHandler() {
+    public BackgroundTaskHandler setUploadCallback(RetrofitUploadData.UploadCallback uploadCallback) {
+        this.backgroundCallback = backgroundCallback;
+        return this;
     }
 
-    public BackgroundTaskHandler(BackgroundCallback callback) {
-        this.backgroundCallback = callback;
-    }
+    public BackgroundTaskHandler() {}
 
     @Override
     protected String doInBackground(String... msg) {
         switch (msg[TYPE]) {
-            case Message.CONNECT:
-                Log.d("BackgroundTaskHandler", "Connecting server...");
-                Endpoint.getInstance();
-                break;
-
             case Message.REQUEST_CREATE_GROUP:
-                Log.d("BackgroundTaskHandler", "send group create request to server."); // XXX: caution!
-
-                Message message = new Message().setType(Message.REQUEST_CREATE_GROUP);
-
-                setCallBack();
-                sendMessage(
-                        new Message().setType(Message.REQUEST_CREATE_GROUP)
-                );
+                Log.d("delf", "send group create request to server.");
+                requester.commonRequest(new Message().setType(Message.REQUEST_CREATE_GROUP).toString());
                 break;
 
             case Message.REQUEST_JOIN_GROUP:
-                setCallBack();
-                Log.d("BackgroundTaskHandler", "send group join request to server. group pk is \"" + msg[GROUP_PK] + "\"");
-                sendMessage(
-                        new Message().setType(Message.REQUEST_JOIN_GROUP)
-                                .add(Message.GROUP_PK, msg[GROUP_PK]) // msg[1]: group key
-                );
+                Log.d("delf", "send group join request to server. group pk is \"" + msg[GROUP_PK] + "\"");
+                Message requestMessage = new Message().setType(Message.REQUEST_JOIN_GROUP);
+                requestMessage.add(Message.GROUP_PK, msg[GROUP_PK]);
+                requester.commonRequest(requestMessage.toString());
                 break;
 
             case Message.UPLOAD:
                 Log.d("BackgroundTaskHandler", "send upload request to server");
                 switch (msg[1]) {
                     case "text":
-                        Endpoint.getUploader().uploadStringData(sendText);
+                        MessageHandler.getUploader().uploadStringData(sendText);
                         break;
                     case "image":
-                        Endpoint.getUploader().uploadImageData(sendBitmapImage);
+                        MessageHandler.getUploader().uploadImageData(sendBitmapImage);
+                        // Endpoint.getUploader().uploadImageData(sendBitmapImage);
                         break;
                     case "file":
-                        Endpoint.getUploader().uploadMultipartData(filePath);
+                        MessageHandler.getUploader().uploadMultipartData(filePath);
+                        // Endpoint.getUploader().uploadMultipartData(filePath);
                         break;
                 }
                 break;
-
+/*
             case Message.DOWNLOAD:
                 Log.d("BackgroundTaskHandler", "Send download request to server. pk is " + Endpoint.lastContentsPK);
                 try {
@@ -110,7 +79,7 @@ public class BackgroundTaskHandler extends AsyncTask<String, Void, String> {
                     Log.e("delf", "Error at sending download request");
                     // e.printStackTrace();
                 }
-                break;
+                break;*/
 
             case Message.REQUEST_EXIT_GROUP:
                 Log.d("BackgroundTaskHandler", "Send exit request to server");
@@ -134,24 +103,44 @@ public class BackgroundTaskHandler extends AsyncTask<String, Void, String> {
     }
 
     private void sendMessage(Message message) {
-        try {
+        // 임시주석
+        /*try {
             Endpoint.getInstance().sendMessage(message);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (EncodeException e) {
             e.printStackTrace();
-        }
+        }*/
+    }
+
+    private void setCallBack2() {
+
     }
 
     private void setCallBack() {
-        final Endpoint.SecondCallback secondResult = new Endpoint.SecondCallback() {
+        // 임시주석
+        /*final Endpoint.SecondCallback secondResult = new Endpoint.SecondCallback() {
             @Override
-            // method name recommendation: onResponseAtEndpoint() // tmp
-            public void onEndpointResponse(JSONObject responseFromServer) {
+            public void onEndpointResponse(Message responseFromServer) {
                 backgroundCallback.onSuccess(responseFromServer); // call in MainActivity
             }
         };
-        Endpoint.getInstance().setSecondCallback(secondResult);
+        Endpoint.getInstance().setSecondCallback(secondResult);*/
+    }
+
+    public BackgroundTaskHandler setSendBitmapImage(Bitmap sendBitmapImage) {
+        this.sendBitmapImage = sendBitmapImage;
+        return this;
+    }
+
+    public BackgroundTaskHandler setSendText(String sendText) {
+        this.sendText = sendText;
+        return this;
+    }
+
+    public BackgroundTaskHandler setFilePath(String filePath) {
+        this.filePath = filePath;
+        return this;
     }
 
     @Override

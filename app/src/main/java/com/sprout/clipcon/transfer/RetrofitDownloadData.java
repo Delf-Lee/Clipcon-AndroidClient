@@ -13,7 +13,6 @@ import android.util.Log;
 
 import com.sprout.clipcon.model.Contents;
 import com.sprout.clipcon.model.History;
-import com.sprout.clipcon.server.Endpoint;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -31,7 +30,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -88,7 +86,9 @@ public class RetrofitDownloadData {
      */
     public void requestDataDownload(String downloadDataPK) throws MalformedURLException {
         // retrieving Contents from My History
-        History myhistory = Endpoint.getUser().getGroup().getHistory();
+        // 임시주석
+        // History myhistory = Endpoint.getUser().getGroup().getHistory();
+        History myhistory = null; // 임시 라인
         requestContents = myhistory.getContentsByPK(downloadDataPK);
          if (requestContents == null) {
             Log.d("delf", "[SYSTEM] requestContents is null");

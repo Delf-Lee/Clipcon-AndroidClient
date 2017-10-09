@@ -24,7 +24,6 @@ import com.sprout.clipcon.R;
 import com.sprout.clipcon.activity.GroupActivity;
 import com.sprout.clipcon.model.Contents;
 import com.sprout.clipcon.model.Message;
-import com.sprout.clipcon.server.Endpoint;
 import com.sprout.clipcon.server.BackgroundTaskHandler;
 import com.sprout.clipcon.transfer.RetrofitDownloadData;
 
@@ -45,7 +44,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     public HistoryAdapter(Context context, ArrayList<Contents> contentsList) {
         this.context = context;
         this.contentsList = contentsList;
-        Endpoint.getDownloader().setContext(context);
+        // 임시주석
+        // Endpoint.getDownloader().setContext(context);
     }
 
     @Override
@@ -211,8 +211,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 mNotifyManager.notify(id, mBuilder.build());
             }
         };
-
-        Endpoint.getDownloader().setDownloadCallback(downloadCallback);
+        // 임시주석
+        // Endpoint.getDownloader().setDownloadCallback(downloadCallback);
     }
 
     public String convertContentsSize(long size) {
