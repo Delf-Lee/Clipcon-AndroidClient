@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.sprout.clipcon.model.Contents;
 import com.sprout.clipcon.model.History;
+import com.sprout.clipcon.server.MessageHandler;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -69,6 +70,14 @@ public class RetrofitDownloadData {
         this.groupPK = groupPK;
     }
 
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setGroupPK(String groupPK) {
+        this.groupPK = groupPK;
+    }
+
     /** Setter */
     public void setDownloadCallback(DownloadCallback downloadCallback) {
         this.downloadCallback = downloadCallback;
@@ -86,9 +95,8 @@ public class RetrofitDownloadData {
      */
     public void requestDataDownload(String downloadDataPK) throws MalformedURLException {
         // retrieving Contents from My History
-        // 임시주석
-        // History myhistory = Endpoint.getUser().getGroup().getHistory();
-        History myhistory = null; // 임시 라인
+
+        History myhistory = MessageHandler.getInstance().getUser().getGroup().getHistory();
         requestContents = myhistory.getContentsByPK(downloadDataPK);
          if (requestContents == null) {
             Log.d("delf", "[SYSTEM] requestContents is null");

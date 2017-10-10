@@ -8,6 +8,8 @@ import com.sprout.clipcon.model.Message;
 import com.sprout.clipcon.transfer.RetrofitCommonRequest;
 import com.sprout.clipcon.transfer.RetrofitUploadData;
 
+import java.net.MalformedURLException;
+
 /**
  * Created by delf on 17-05-06.
  */
@@ -22,13 +24,14 @@ public class BackgroundTaskHandler extends AsyncTask<String, Void, String> {
 
     private RetrofitCommonRequest requester;
 
-    private BackgroundCallback backgroundCallback;
-    public interface BackgroundCallback {
+    private GcBackgroundCallback backgroundCallback;
+    public interface GcBackgroundCallback {
         void onSuccess(Message result);
     }
-    public BackgroundTaskHandler setBackgroundCallback(BackgroundCallback backgroundCallback) {
-        this.backgroundCallback = backgroundCallback;
+    public BackgroundTaskHandler() {requester = new RetrofitCommonRequest(backgroundCallback);}
+    public BackgroundTaskHandler setBackgroundCallback(GcBackgroundCallback backgroundCallback) {
         requester = new RetrofitCommonRequest(backgroundCallback);
+        this.backgroundCallback = backgroundCallback;
         return this;
     }
 
@@ -37,7 +40,7 @@ public class BackgroundTaskHandler extends AsyncTask<String, Void, String> {
         return this;
     }
 
-    public BackgroundTaskHandler() {}
+
 
     @Override
     protected String doInBackground(String... msg) {
@@ -70,22 +73,20 @@ public class BackgroundTaskHandler extends AsyncTask<String, Void, String> {
                         break;
                 }
                 break;
-/*
             case Message.DOWNLOAD:
-                Log.d("BackgroundTaskHandler", "Send download request to server. pk is " + Endpoint.lastContentsPK);
                 try {
-                    Endpoint.getDownloader().requestDataDownload(msg[1]); // for test
+                    MessageHandler.getDownloader().requestDataDownload(msg[1]); // for test
                 } catch (MalformedURLException e) {
                     Log.e("delf", "Error at sending download request");
-                    // e.printStackTrace();
                 }
-                break;*/
+                break;
 
             case Message.REQUEST_EXIT_GROUP:
                 Log.d("BackgroundTaskHandler", "Send exit request to server");
-                sendMessage(
-                        new Message().setType(Message.REQUEST_EXIT_GROUP)
-                );
+                Message message = new Message().setType(Message.REQUEST_EXIT_GROUP);
+                message.add(Message.GROUP_PK, msg[1]);
+                message.add(Message.NAME, msg[2]);
+                requester.commonRequest(message.toString());
                 break;
 
             case Message.REQUEST_CHANGE_NAME:

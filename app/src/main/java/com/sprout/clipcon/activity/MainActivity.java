@@ -25,12 +25,11 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
 
     static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 1000;
+    private String groupKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FirebaseMessaging.getInstance().subscribeToTopic("notice");
-
         setContentView(R.layout.activity_main);
 
         Button createBtn = (Button) findViewById(R.id.main_create);
@@ -40,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final BackgroundTaskHandler.BackgroundCallback result = new BackgroundTaskHandler.BackgroundCallback() {
+                final BackgroundTaskHandler.GcBackgroundCallback result = new BackgroundTaskHandler.GcBackgroundCallback() {
                     @Override
                     public void onSuccess(Message response) {
                         try {
@@ -74,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 .input(R.string.empty, R.string.empty, false, new MaterialDialog.InputCallback() {
                     @Override
                     public void onInput(@NonNull MaterialDialog dialog, final CharSequence inputGroupKey) {
-                        final BackgroundTaskHandler.BackgroundCallback result = new BackgroundTaskHandler.BackgroundCallback() {
+                        final BackgroundTaskHandler.GcBackgroundCallback result = new BackgroundTaskHandler.GcBackgroundCallback() {
                             @Override
                             public void onSuccess(Message response) {
                                 try {
@@ -101,9 +100,17 @@ public class MainActivity extends AppCompatActivity {
                 }).show();
     }
 
+    @Override
+    public void onDestroy() {
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(groupKey);
+        MessageHandler.getInstance().request(Message.REQUEST_EXIT_GROUP, null);
+        super.onDestroy();
+    }
+
     private void startGroupActivity(JSONObject response) throws JSONException {
         Intent intent = new Intent(MainActivity.this, GroupActivity.class);
-
+        groupKey = response.get(Message.GROUP_PK).toString();
+        FirebaseMessaging.getInstance().subscribeToTopic(groupKey);
         intent.putExtra("response", response.toString()); // send response to GroupActivity
         startActivity(intent);
     }
@@ -144,5 +151,9 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         }
+    }
+
+    public void setGroupKey(String groupKey) {
+        this.groupKey = groupKey;
     }
 }

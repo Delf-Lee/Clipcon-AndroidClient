@@ -24,6 +24,7 @@ import com.sprout.clipcon.adapter.MemberAdapter;
 import com.sprout.clipcon.model.Member;
 import com.sprout.clipcon.model.Message;
 import com.sprout.clipcon.server.BackgroundTaskHandler;
+import com.sprout.clipcon.server.MessageHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,6 +62,7 @@ public class InfoFragment extends Fragment {
         editNickName = (ImageView) view.findViewById(R.id.editNickName);
 
         try {
+            Log.d("delf", "getActivity().getIntent().getStringExtra(\"response\"): " + getActivity().getIntent().getStringExtra("response"));
             JSONObject response = new JSONObject(getActivity().getIntent().getStringExtra("response"));
             groupKey = response.get(Message.GROUP_PK).toString();
             nickName = response.get(Message.NAME).toString();
@@ -144,8 +146,7 @@ public class InfoFragment extends Fragment {
     }
 
     private void setMemberCallback() {
-        // 임시주석
-        /*Endpoint.ParticipantCallback participantResult = new Endpoint.ParticipantCallback() {
+        MessageHandler.ParticipantCallback participantResult = new MessageHandler.ParticipantCallback() {
             @Override
             public void onParticipantStatus(final String newMember) {
                 System.out.println("Member List Changed");
@@ -157,19 +158,19 @@ public class InfoFragment extends Fragment {
                 });
             }
         };
-        Endpoint.getInstance().setParticipantCallback(participantResult);*/
+        MessageHandler.getInstance().setParticipantCallback(participantResult);
     }
 
     private void setNicknameCallback() {
-        // 임시주석
-     /*   Endpoint.NameChangeCallback nameChangeCallback = new Endpoint.NameChangeCallback() {
+
+        MessageHandler.NameChangeCallback nameChangeCallback = new MessageHandler.NameChangeCallback() {
             @Override
             public void onSuccess(String origin, String changed) {
                 Log.d("delf", "setNickName(): onSuccess.");
                 changeNickname(origin, changed);
             }
         };
-        Endpoint.getInstance().setNameChangeCallback(nameChangeCallback);*/
+        MessageHandler.getInstance().setNameChangeCallback(nameChangeCallback);
     }
 
     public boolean isContain(String name) {

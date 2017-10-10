@@ -13,12 +13,10 @@ import android.util.Log;
 
 import com.sprout.clipcon.R;
 import com.sprout.clipcon.activity.GroupActivity;
+import com.sprout.clipcon.server.MessageHandler;
 
 
 public class NotificationService extends Service {
-    // 임시주석
-    //Endpoint endpoint = Endpoint.getInstance();
-
     private NotificationManager notificationManager;
     private Notification.Builder builder;
     private PendingIntent pendingIntent;
@@ -34,8 +32,7 @@ public class NotificationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("delf", "[SYSTEM] NotificationService: onStartCommand()");
         myServiceHandler handler = new myServiceHandler();
-        // 임시주석
-        // endpoint.setHandler(handler);
+        MessageHandler.getInstance().setHandler(handler);
         return START_STICKY;
     }
 

@@ -22,11 +22,12 @@ import android.view.MenuItem;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.sprout.clipcon.R;
 import com.sprout.clipcon.fragment.HistoryFragment;
 import com.sprout.clipcon.fragment.InfoFragment;
 import com.sprout.clipcon.model.Message;
-import com.sprout.clipcon.server.BackgroundTaskHandler;
+import com.sprout.clipcon.server.MessageHandler;
 import com.sprout.clipcon.service.ClipboardService;
 import com.sprout.clipcon.service.NotificationService;
 
@@ -46,7 +47,6 @@ public class GroupActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.group_activity);
-
         initLayout();
         checkStart();
     }
@@ -111,7 +111,8 @@ public class GroupActivity extends AppCompatActivity {
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        new BackgroundTaskHandler().execute(Message.REQUEST_EXIT_GROUP);
+                        MessageHandler.getInstance().request(Message.REQUEST_EXIT_GROUP, null);
+                        FirebaseMessaging.getInstance().unsubscribeFromTopic(MessageHandler.getInstance().getUser().getGroup().getPrimaryKey());
                         Intent intent = new Intent(getApplicationContext(), ClipboardService.class);
                         stopService(intent);
                         GroupActivity.super.onBackPressed();

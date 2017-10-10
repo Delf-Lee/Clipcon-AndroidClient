@@ -47,6 +47,14 @@ public class RetrofitUploadData {
         this.groupPK = groupPK;
     }
 
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setGroupPK(String groupPK) {
+        this.groupPK = groupPK;
+    }
+
     /** Setter */
     public void setUploadCallback(UploadCallback uploadCallback) {
         this.uploadCallback = uploadCallback;

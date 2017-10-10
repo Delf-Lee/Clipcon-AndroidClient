@@ -32,8 +32,8 @@ public class RetrofitCommonRequest {
 
     private String charset = "UTF-8";
 
-    BackgroundTaskHandler.BackgroundCallback backgroundCallback;
-    public RetrofitCommonRequest(BackgroundTaskHandler.BackgroundCallback backgroundCallback) {
+    BackgroundTaskHandler.GcBackgroundCallback backgroundCallback;
+    public RetrofitCommonRequest(BackgroundTaskHandler.GcBackgroundCallback backgroundCallback) {
         this.backgroundCallback = backgroundCallback;
     }
 
@@ -52,7 +52,11 @@ public class RetrofitCommonRequest {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 // Log.d("delf", "response.body(): " + getString(response.body().byteStream()));
-                backgroundCallback.onSuccess(new Message().setJson(getString(response.body().byteStream())));
+                try {
+                    backgroundCallback.onSuccess(new Message().setJson(getString(response.body().byteStream())));
+                }catch (NullPointerException e) {
+
+                }
             }
 
             @Override
